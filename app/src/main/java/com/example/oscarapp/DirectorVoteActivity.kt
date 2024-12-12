@@ -1,7 +1,9 @@
 package com.example.oscarapp
 
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
+import android.widget.ProgressBar
 import android.widget.RadioButton
 import android.widget.RadioGroup
 import android.widget.Toast
@@ -9,10 +11,10 @@ import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
+import retrofit2.Call
+import android.content.Context
 
 class DirectorVoteActivity : AppCompatActivity() {
-
-    private lateinit var selectedDirector: String
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -22,29 +24,31 @@ class DirectorVoteActivity : AppCompatActivity() {
         val btnConfirmVote = findViewById<Button>(R.id.btnConfirmDirectorVote)
 
         // Lista simulada de diretores
-        val directors = listOf("Diretor 1", "Diretor 2", "Diretor 3", "Diretor 4")
-
-        // Adiciona os RadioButtons dinamicamente
+        val directors = listOf("James Cameron", "Alfred Hitchcock", "Steven Spielberg")
         directors.forEach { director ->
             val radioButton = RadioButton(this)
             radioButton.text = director
             radioGroup.addView(radioButton)
         }
 
-        // Lida com a seleção do RadioGroup
-        radioGroup.setOnCheckedChangeListener { _, checkedId ->
-            val radioButton = findViewById<RadioButton>(checkedId)
-            selectedDirector = radioButton.text.toString()
-        }
-
-        // Confirma o voto
         btnConfirmVote.setOnClickListener {
-            if (::selectedDirector.isInitialized) {
-                Toast.makeText(this, "Você votou em: $selectedDirector", Toast.LENGTH_SHORT).show()
-                // Salvar voto local ou passar para ConfirmVoteActivity
+            val selectedRadioButtonId = radioGroup.checkedRadioButtonId
+            if (selectedRadioButtonId == -1) {
+                Toast.makeText(this, "Por favor, selecione um diretor.", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "Selecione um diretor para votar.", Toast.LENGTH_SHORT).show()
+                val selectedDirector = findViewById<RadioButton>(selectedRadioButtonId).text.toString()
+                saveSelectedDirector(selectedDirector)
+                Toast.makeText(this, "Você votou no diretor: $selectedDirector", Toast.LENGTH_SHORT).show()
+                finish() // Finaliza a activity e retorna para a anterior
             }
         }
     }
+
+    private fun saveSelectedDirector(directorName: String) {
+        val sharedPreferences = getSharedPreferences("MovieVotePrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putString("SELECTED_DIRECTOR", directorName)
+        editor.apply()
+    }
 }
+

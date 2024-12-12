@@ -10,6 +10,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 
+import android.content.Context
+
 class ConfirmVoteActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -18,33 +20,34 @@ class ConfirmVoteActivity : AppCompatActivity() {
 
         val tvSelectedMovie = findViewById<TextView>(R.id.tvSelectedMovie)
         val tvSelectedDirector = findViewById<TextView>(R.id.tvSelectedDirector)
-        val etToken = findViewById<EditText>(R.id.etToken)
-        val btnSendVote = findViewById<Button>(R.id.btnSendVote)
+        val btnConfirmVote = findViewById<Button>(R.id.btnConfirmVote)
 
-        // Simulação de dados passados das outras telas
-        val selectedMovie = intent.getStringExtra("SELECTED_MOVIE") ?: "Nenhum filme selecionado"
-        val selectedDirector = intent.getStringExtra("SELECTED_DIRECTOR") ?: "Nenhum diretor selecionado"
+        // Recupera os valores do SharedPreferences
+        val sharedPreferences = getSharedPreferences("MovieVotePrefs", Context.MODE_PRIVATE)
+        val selectedMovie = sharedPreferences.getString("SELECTED_MOVIE", "Nenhum filme selecionado")
+        val selectedDirector = sharedPreferences.getString("SELECTED_DIRECTOR", "Nenhum diretor selecionado")
 
+        // Exibe os valores na tela
         tvSelectedMovie.text = "Filme Selecionado: $selectedMovie"
         tvSelectedDirector.text = "Diretor Selecionado: $selectedDirector"
 
-        // Envia o voto
-        btnSendVote.setOnClickListener {
-            val token = etToken.text.toString()
-            if (token.isEmpty()) {
-                Toast.makeText(this, "Por favor, insira o token.", Toast.LENGTH_SHORT).show()
-                return@setOnClickListener
-            }
-
-            // Simular envio para o servidor
-            val success = token == "1234" // Token correto para teste
-            if (success) {
-                Toast.makeText(this, "Voto confirmado com sucesso!", Toast.LENGTH_SHORT).show()
-                // Bloquear modificações
-                finish()
+        // Confirma o voto
+        btnConfirmVote.setOnClickListener {
+            if (selectedMovie == "Nenhum filme selecionado" || selectedDirector == "Nenhum diretor selecionado") {
+                Toast.makeText(this, "Você precisa selecionar um filme e um diretor antes de confirmar.", Toast.LENGTH_SHORT).show()
             } else {
-                Toast.makeText(this, "Token inválido, tente novamente.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Voto confirmado com sucesso!", Toast.LENGTH_SHORT).show()
+                clearSharedPreferences()
+                finish() // Finaliza a activity
             }
         }
     }
+
+    private fun clearSharedPreferences() {
+        val sharedPreferences = getSharedPreferences("MovieVotePrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.clear() // Limpa todos os valores
+        editor.apply()
+    }
 }
+

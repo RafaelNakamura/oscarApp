@@ -5,19 +5,11 @@
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/tvConfirmVoteTitle"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="Confirmar Voto"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp" />
-
-    <TextView
         android:id="@+id/tvSelectedMovie"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Filme Selecionado: "
+        android:textSize="18sp"
         android:layout_marginBottom="8dp" />
 
     <TextView
@@ -25,19 +17,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Diretor Selecionado: "
+        android:textSize="18sp"
         android:layout_marginBottom="16dp" />
 
-    <EditText
-        android:id="@+id/etToken"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Digite seu Token"
-        android:inputType="number" />
-
     <Button
-        android:id="@+id/btnSendVote"
+        android:id="@+id/btnConfirmVote"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Enviar Voto"
-        android:layout_marginTop="16dp" />
+        android:text="Confirmar Voto" />
 </LinearLayout>
