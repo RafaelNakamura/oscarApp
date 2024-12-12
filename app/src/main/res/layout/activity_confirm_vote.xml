@@ -2,44 +2,27 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:gravity="center"
     android:padding="16dp">
 
     <TextView
-        android:id="@+id/tvConfirmVoteTitle"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Confirmar Voto"
-        android:textSize="25sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="16dp" />
-
-    <TextView
         android:id="@+id/tvSelectedMovie"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Filme Selecionado: "
-        android:layout_marginTop="10dp" />
+        android:textSize="18sp"
+        android:layout_marginBottom="8dp" />
 
     <TextView
         android:id="@+id/tvSelectedDirector"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Diretor Selecionado: "
-        android:layout_marginTop="10dp" />
-
-    <EditText
-        android:id="@+id/etToken"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Digite seu Token"
-        android:inputType="number"
-        android:layout_marginTop="10dp" />
+        android:text="Diretor Selecionado: "
+        android:textSize="18sp"
+        android:layout_marginBottom="16dp" />
 
     <Button
-        android:id="@+id/btnSendVote"
-        android:layout_width="250dp"
+        android:id="@+id/btnConfirmVote"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp"
-        android:text="Enviar Voto" />
+        android:text="Confirmar Voto" />
 </LinearLayout>
