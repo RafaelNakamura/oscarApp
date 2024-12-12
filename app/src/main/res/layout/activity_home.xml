@@ -15,31 +15,35 @@
         android:id="@+id/tvWelcomeMessage"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Bem-vindo!"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="15dp"
+        android:text="Bem-vindo! Selecione uma categoria!"
         android:textSize="18sp" />
 
     <Button
         android:id="@+id/btnVoteMovie"
-        android:layout_width="match_parent"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
         android:text="Votar Filme" />
 
     <Button
         android:id="@+id/btnVoteDirector"
-        android:layout_width="match_parent"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
         android:text="Votar Diretor" />
 
     <Button
         android:id="@+id/btnConfirmVote"
-        android:layout_width="match_parent"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
         android:text="Confirmar Voto" />
 
     <Button
         android:id="@+id/btnLogout"
-        android:layout_width="match_parent"
+        android:layout_width="250dp"
         android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
         android:text="Sair" />
 </LinearLayout>
