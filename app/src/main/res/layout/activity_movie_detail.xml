@@ -1,0 +1,35 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <ImageView
+        android:id="@+id/imgDetailPoster"
+        android:layout_width="match_parent"
+        android:layout_height="300dp"
+        android:scaleType="centerCrop" />
+
+    <TextView
+        android:id="@+id/tvDetailName"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Nome do Filme"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginTop="8dp" />
+
+    <TextView
+        android:id="@+id/tvDetailGenre"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Gênero"
+        android:textSize="16sp"
+        android:layout_marginTop="4dp" />
+
+    <Button
+        android:id="@+id/btnVoteMovie"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Votar" />
+</LinearLayout>
