@@ -1,6 +1,7 @@
 package com.example.oscarapp
 
 data class Vote(
-    val idDirector: Int,
-    val idMovie: Int
+    val filme: Int,
+    val diretor: Int,
+    val usuarioId: Int,
 )

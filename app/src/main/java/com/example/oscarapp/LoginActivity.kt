@@ -3,8 +3,10 @@ package com.example.oscarapp
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
@@ -24,6 +26,7 @@ class LoginActivity : AppCompatActivity() {
         val username = findViewById<EditText>(R.id.etUsername)
         val password = findViewById<EditText>(R.id.etPassword)
         val btnLogin = findViewById<Button>(R.id.btnLogin)
+        val progressBar = findViewById<ProgressBar>(R.id.progressBarLogin)
 
         btnLogin.setOnClickListener {
             val user = username.text.toString()
@@ -34,22 +37,29 @@ class LoginActivity : AppCompatActivity() {
                 return@setOnClickListener
             }
 
-            authenticate(user, pass)
+            // Exibe o ProgressBar e desabilita o botão enquanto a autenticação ocorre
+            progressBar.visibility = View.VISIBLE
+            btnLogin.isEnabled = false
+
+            authenticate(user, pass, progressBar, btnLogin)
         }
     }
 
-    private fun authenticate(username: String, password: String) {
+    private fun authenticate(username: String, password: String, progressBar: ProgressBar, btnLogin: Button) {
         val api = RetrofitClientLogin.instance.create(ApiService::class.java)
         val loginRequest = LoginRequest(username, password)
 
         api.login(loginRequest).enqueue(object : Callback<LoginResponse> {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
+                progressBar.visibility = View.GONE
+                btnLogin.isEnabled = true
+
                 if (response.isSuccessful) {
                     val loginResponse = response.body()
                     if (loginResponse != null) {
                         saveToken(loginResponse.token ?: "", loginResponse.usuarioId)
-                        if(loginResponse.voto != null){
-                            saveVote(loginResponse.voto)
+                        if (loginResponse.votos != null) {
+                            saveVote(loginResponse.votos)
                         }
                         Toast.makeText(this@LoginActivity, "Login bem-sucedido!", Toast.LENGTH_SHORT).show()
                         navigateToNextActivity()
@@ -62,6 +72,8 @@ class LoginActivity : AppCompatActivity() {
             }
 
             override fun onFailure(call: Call<LoginResponse>, t: Throwable) {
+                progressBar.visibility = View.GONE
+                btnLogin.isEnabled = true
                 Toast.makeText(this@LoginActivity, "Falha na comunicação: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
@@ -70,8 +82,8 @@ class LoginActivity : AppCompatActivity() {
     private fun saveVote(voto: Vote) {
         val sharedPreferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
-        editor.putInt("VOTO_FILME", voto.idMovie);
-        editor.putInt("VOTO_DIRETOR", voto.idDirector);
+        editor.putInt("VOTO_FILME", voto.filme)
+        editor.putInt("VOTO_DIRETOR", voto.diretor)
         editor.apply()
     }
 
@@ -95,5 +107,5 @@ class LoginActivity : AppCompatActivity() {
         editor.clear()
         editor.apply()
     }
-
 }
+

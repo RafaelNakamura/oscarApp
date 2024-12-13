@@ -5,33 +5,28 @@ import android.content.Intent
 import android.os.Bundle
 import android.widget.Button
 import android.widget.TextView
-import androidx.activity.enableEdgeToEdge
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.ViewCompat
-import androidx.core.view.WindowInsetsCompat
 
 class HomeActivity : AppCompatActivity() {
+
+    private lateinit var btnVoteMovie: Button
+    private lateinit var btnVoteDirector: Button
+    private lateinit var btnConfirmVote: Button
+    private lateinit var btnLogout: Button
+    private lateinit var tvWelcomeMsg: TextView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home)
 
-        val btnVoteMovie = findViewById<Button>(R.id.btnVoteMovie)
-        val btnVoteDirector = findViewById<Button>(R.id.btnVoteDirector)
-        val btnConfirmVote = findViewById<Button>(R.id.btnConfirmVote)
-        val btnLogout = findViewById<Button>(R.id.btnLogout)
-        val tvWelcomeMsg = findViewById<TextView>(R.id.tvWelcomeMessage)
+        btnVoteMovie = findViewById(R.id.btnVoteMovie)
+        btnVoteDirector = findViewById(R.id.btnVoteDirector)
+        btnConfirmVote = findViewById(R.id.btnConfirmVote)
+        btnLogout = findViewById(R.id.btnLogout)
+        tvWelcomeMsg = findViewById(R.id.tvWelcomeMessage)
 
         val sharedPreferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
         val authToken = sharedPreferences.getString("AUTH_TOKEN", "Token não encontrado")
-        val votoFilme = sharedPreferences.getInt("VOTO_FILME", -1)
-        val votoDiretor = sharedPreferences.getInt("VOTO_DIRETOR", -1)
-
-        if (!(votoFilme == -1 && votoDiretor == -1)) {
-            btnVoteDirector.isEnabled = false
-            btnVoteMovie.isEnabled = false
-        }
-
         tvWelcomeMsg.text = "Bem-vindo! Seu token de autenticação é: $authToken"
 
         btnVoteMovie.setOnClickListener {
@@ -48,6 +43,19 @@ class HomeActivity : AppCompatActivity() {
 
         btnLogout.setOnClickListener {
             finish()
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val sharedPreferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+        val votoFilme = sharedPreferences.getInt("VOTO_FILME", -1)
+        val votoDiretor = sharedPreferences.getInt("VOTO_DIRETOR", -1)
+
+        if(votoFilme != -1 && votoDiretor != -1){
+            btnVoteMovie.isEnabled = false
+            btnVoteDirector.isEnabled = false
         }
     }
 }

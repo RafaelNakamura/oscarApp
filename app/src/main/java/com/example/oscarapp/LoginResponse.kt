@@ -5,5 +5,5 @@ data class LoginResponse(
     val message: String,
     val usuarioId: Int,
     val token: String?,
-    val voto: Vote
+    val votos: Vote
 )

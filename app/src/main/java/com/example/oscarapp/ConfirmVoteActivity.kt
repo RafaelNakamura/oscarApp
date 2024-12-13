@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ProgressBar
 import android.widget.RadioButton
 import android.widget.TextView
 import android.widget.Toast
@@ -27,6 +28,11 @@ class ConfirmVoteActivity : AppCompatActivity() {
         val tvSelectedMovie = findViewById<TextView>(R.id.tvSelectedMovie)
         val tvSelectedDirector = findViewById<TextView>(R.id.tvSelectedDirector)
         val btnConfirmVote = findViewById<Button>(R.id.btnConfirmVote)
+        val progressBar = findViewById<ProgressBar>(R.id.progressBarConfirm)
+
+        // Exibe o ProgressBar enquanto os dados estão sendo carregados
+        progressBar.visibility = View.VISIBLE
+        btnConfirmVote.isEnabled = false
 
         // Recupera os valores do SharedPreferences
         val sharedPreferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
@@ -39,43 +45,54 @@ class ConfirmVoteActivity : AppCompatActivity() {
         val votoFilme = sharedPreferences.getInt("VOTO_FILME", -1)
         val votoDiretor = sharedPreferences.getInt("VOTO_DIRETOR", -1)
 
-        if (!(votoFilme == -1 && votoDiretor == -1)) {
-            btnConfirmVote.isEnabled = false
+        // Variáveis para rastrear carregamento
+        var isDirectorsLoaded = false
+        var isMoviesLoaded = false
 
-            fetchDirectors { directors ->
-                directors.forEach { director ->
-                    if(director.id == votoDiretor){
-                        selectedDirector = director.nome
-                    }
-                }
-            }
-
-            fetchMovies { movies ->
-                movies.forEach { movie ->
-                    if(movie.id == votoFilme){
-                        selectedMovie = movie.nome;
-                    }
-                }
+        // Função para atualizar a tela após os dados serem carregados
+        fun updateUI() {
+            if (isDirectorsLoaded && isMoviesLoaded) {
+                progressBar.visibility = View.GONE
+                btnConfirmVote.isEnabled = votoFilme == -1 && votoDiretor == -1
+                tvSelectedMovie.text = "Filme Selecionado: $selectedMovie"
+                tvSelectedDirector.text = "Diretor Selecionado: $selectedDirector"
             }
         }
 
-        // Exibe os valores na tela
-        tvSelectedMovie.text = "Filme Selecionado: $selectedMovie"
-        tvSelectedDirector.text = "Diretor Selecionado: $selectedDirector"
+        // Carrega os diretores
+        fetchDirectors { directors ->
+            directors.forEach { director ->
+                if (director.id == votoDiretor) {
+                    selectedDirector = director.nome
+                }
+            }
+            isDirectorsLoaded = true
+            updateUI()
+        }
+
+        // Carrega os filmes
+        fetchMovies { movies ->
+            movies.forEach { movie ->
+                if (movie.id == votoFilme) {
+                    selectedMovie = movie.nome
+                }
+            }
+            isMoviesLoaded = true
+            updateUI()
+        }
 
         // Ao clicar no botão de confirmar voto
         btnConfirmVote.setOnClickListener {
-            // Verifica se ambos os campos foram preenchidos
             if (selectedMovie == "Nenhum filme selecionado" || selectedDirector == "Nenhum diretor selecionado") {
                 Toast.makeText(this, "Você precisa selecionar um filme e um diretor antes de confirmar.", Toast.LENGTH_SHORT).show()
             } else {
-                // Exibe o AlertDialog de confirmação
                 if (selectedMovie != null && selectedDirector != null) {
                     showConfirmationDialog(selectedMovieId, selectedDirectorId, token ?: "")
                 }
             }
         }
     }
+
 
     // Função que cria e exibe o AlertDialog
     private fun showConfirmationDialog(movie: Int, director: Int, token: String) {
@@ -97,8 +114,6 @@ class ConfirmVoteActivity : AppCompatActivity() {
 
             // Executa os próximos passos somente se o token estiver correto
             enviarVoto(usuarioId, movie, director)
-            Toast.makeText(this, "Voto confirmado!", Toast.LENGTH_SHORT).show()
-            finish() // Finaliza a activity e retorna à tela anterior
         }
 
         // Botão "Cancelar"
@@ -122,6 +137,7 @@ class ConfirmVoteActivity : AppCompatActivity() {
     private fun enviarVoto(usuarioId: Int, filme: Int, diretor: Int) {
         val api = RetrofitClientLogin.instance.create(ApiService::class.java)
         val votoRequest = VotoRequest(filme, diretor, usuarioId)
+        val btnConfirmVote = findViewById<Button>(R.id.btnConfirmVote)
 
         api.votar(votoRequest).enqueue(object : Callback<VotoResponse> {
             override fun onResponse(call: Call<VotoResponse>, response: Response<VotoResponse>) {
@@ -129,7 +145,8 @@ class ConfirmVoteActivity : AppCompatActivity() {
                     val votoResponse = response.body()
                     if (votoResponse != null && votoResponse.success) {
                         Toast.makeText(this@ConfirmVoteActivity, "Voto registrado com sucesso!", Toast.LENGTH_SHORT).show()
-                        finish()
+                        saveLocalVote(votoRequest)
+                        btnConfirmVote.isEnabled = false;
                     } else {
                         Toast.makeText(this@ConfirmVoteActivity, votoResponse?.message ?: "Erro desconhecido", Toast.LENGTH_SHORT).show()
                     }
@@ -142,6 +159,14 @@ class ConfirmVoteActivity : AppCompatActivity() {
                 Toast.makeText(this@ConfirmVoteActivity, "Falha na comunicação: ${t.message}", Toast.LENGTH_SHORT).show()
             }
         })
+    }
+
+    private fun saveLocalVote(voto: VotoRequest) {
+        val sharedPreferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.putInt("VOTO_FILME", voto.filme);
+        editor.putInt("VOTO_DIRETOR", voto.diretor);
+        editor.apply()
     }
 
     private fun fetchDirectors(callback: (List<Director>) -> Unit) {
@@ -174,6 +199,19 @@ class ConfirmVoteActivity : AppCompatActivity() {
             override fun onFailure(call: Call<List<Movie>>, t: Throwable) {
             }
         })
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        val sharedPreferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+        val votoFilme = sharedPreferences.getInt("VOTO_FILME", -1)
+        val votoDiretor = sharedPreferences.getInt("VOTO_DIRETOR", -1)
+        val btnConfirmVote = findViewById<Button>(R.id.btnConfirmVote)
+
+        if (!(votoFilme == -1 && votoDiretor == -1)) {
+            btnConfirmVote.isEnabled = false
+        }
     }
 }
 
