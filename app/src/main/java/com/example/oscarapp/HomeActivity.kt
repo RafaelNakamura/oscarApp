@@ -27,7 +27,7 @@ class HomeActivity : AppCompatActivity() {
 
         val sharedPreferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
         val authToken = sharedPreferences.getString("AUTH_TOKEN", "Token não encontrado")
-        tvWelcomeMsg.text = "Bem-vindo! Seu token de autenticação é: $authToken"
+        tvWelcomeMsg.text = "Bem-vindo! Seu token é: $authToken"
 
         btnVoteMovie.setOnClickListener {
             startActivity(Intent(this, MovieVoteActivity::class.java))
