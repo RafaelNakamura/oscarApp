@@ -25,11 +25,13 @@ class DirectorVoteActivity : AppCompatActivity() {
 
         progressBar.visibility = View.VISIBLE
 
+        // Faz a requisição para buscar os diretores
         fetchDirectors { directors ->
             progressBar.visibility = View.GONE
             directors.forEach { director ->
                 val radioButton = RadioButton(this)
-                radioButton.text = director.nome
+                radioButton.text = director.nome // Nome do diretor
+                radioButton.tag = director.id    // Salva o ID do diretor na tag
                 radioGroup.addView(radioButton)
             }
         }
@@ -39,9 +41,12 @@ class DirectorVoteActivity : AppCompatActivity() {
             if (selectedRadioButtonId == -1) {
                 Toast.makeText(this, "Por favor, selecione um diretor.", Toast.LENGTH_SHORT).show()
             } else {
-                val selectedDirector = findViewById<RadioButton>(selectedRadioButtonId).text.toString()
-                saveSelectedDirector(selectedDirector)
-                Toast.makeText(this, "Você votou no diretor: $selectedDirector", Toast.LENGTH_SHORT).show()
+                val selectedRadioButton = findViewById<RadioButton>(selectedRadioButtonId)
+                val selectedDirectorName = selectedRadioButton.text.toString()
+                val selectedDirectorId = selectedRadioButton.tag.toString().toInt()
+
+                saveSelectedDirector(selectedDirectorName, selectedDirectorId)
+                Toast.makeText(this, "Você votou no diretor: $selectedDirectorName", Toast.LENGTH_SHORT).show()
                 finish()
             }
         }
@@ -65,10 +70,11 @@ class DirectorVoteActivity : AppCompatActivity() {
         })
     }
 
-    private fun saveSelectedDirector(directorName: String) {
-        val sharedPreferences = getSharedPreferences("MovieVotePrefs", Context.MODE_PRIVATE)
+    private fun saveSelectedDirector(directorName: String, directorId: Int) {
+        val sharedPreferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.putString("SELECTED_DIRECTOR", directorName)
+        editor.putInt("SELECTED_DIRECTOR_ID", directorId)
         editor.apply()
     }
 }

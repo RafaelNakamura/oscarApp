@@ -27,7 +27,7 @@ class HomeActivity : AppCompatActivity() {
         val votoFilme = sharedPreferences.getInt("VOTO_FILME", -1)
         val votoDiretor = sharedPreferences.getInt("VOTO_DIRETOR", -1)
 
-        if (!(votoFilme != -1 && votoDiretor != -1)) {
+        if (!(votoFilme == -1 && votoDiretor == -1)) {
             btnVoteDirector.isEnabled = false
             btnVoteMovie.isEnabled = false
         }
@@ -49,17 +49,5 @@ class HomeActivity : AppCompatActivity() {
         btnLogout.setOnClickListener {
             finish()
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        clearSharedPreferences()
-    }
-
-    private fun clearSharedPreferences() {
-        val sharedPreferences = getSharedPreferences("MovieVotePrefs", Context.MODE_PRIVATE)
-        val editor = sharedPreferences.edit()
-        editor.clear()
-        editor.apply()
     }
 }

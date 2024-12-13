@@ -19,6 +19,7 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+        clearSharedPreferences()
 
         val username = findViewById<EditText>(R.id.etUsername)
         val password = findViewById<EditText>(R.id.etPassword)
@@ -45,8 +46,8 @@ class LoginActivity : AppCompatActivity() {
             override fun onResponse(call: Call<LoginResponse>, response: Response<LoginResponse>) {
                 if (response.isSuccessful) {
                     val loginResponse = response.body()
-                    if (loginResponse != null && loginResponse.success) {
-                        saveToken(loginResponse.token ?: "")
+                    if (loginResponse != null) {
+                        saveToken(loginResponse.token ?: "", loginResponse.usuarioId)
                         if(loginResponse.voto != null){
                             saveVote(loginResponse.voto)
                         }
@@ -74,10 +75,11 @@ class LoginActivity : AppCompatActivity() {
         editor.apply()
     }
 
-    private fun saveToken(token: String) {
+    private fun saveToken(token: String, id: Int) {
         val sharedPreferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.putString("AUTH_TOKEN", token)
+        editor.putInt("USER_ID", id)
         editor.apply()
     }
 
@@ -86,4 +88,12 @@ class LoginActivity : AppCompatActivity() {
         startActivity(intent)
         finish()
     }
+
+    private fun clearSharedPreferences() {
+        val sharedPreferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+        val editor = sharedPreferences.edit()
+        editor.clear()
+        editor.apply()
+    }
+
 }

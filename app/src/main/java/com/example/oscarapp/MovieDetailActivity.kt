@@ -27,6 +27,7 @@ class MovieDetailActivity : AppCompatActivity() {
         val name = intent.getStringExtra("MOVIE_NAME") ?: "Nome não disponível"
         val genre = intent.getStringExtra("MOVIE_GENRE") ?: "Gênero não disponível"
         val posterUrl = intent.getStringExtra("MOVIE_POSTER")
+        val id = intent.getIntExtra("MOVIE_ID", -1)
 
         // Exibe os dados na tela
         tvName.text = name
@@ -37,15 +38,16 @@ class MovieDetailActivity : AppCompatActivity() {
 
         // Configura o botão "Votar"
         btnVote.setOnClickListener {
-            saveSelectedMovie(name)
+            saveSelectedMovie(name, id)
             Toast.makeText(this, "Você votou no filme: $name", Toast.LENGTH_SHORT).show()
         }
     }
 
-    private fun saveSelectedMovie(movieName: String) {
-        val sharedPreferences = getSharedPreferences("MovieVotePrefs", Context.MODE_PRIVATE)
+    private fun saveSelectedMovie(movieName: String, id: Int) {
+        val sharedPreferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
         val editor = sharedPreferences.edit()
         editor.putString("SELECTED_MOVIE", movieName)
+        editor.putInt("SELECTED_MOVIE_ID", id)
         editor.apply()
         finish()
     }

@@ -33,9 +33,10 @@
         android:layout_marginBottom="16dp" />
 
     <EditText
+        android:id="@+id/etToken"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
-        android:text="Digite o seu Token:"
+        android:hint="Digite o seu Token:"
         android:layout_marginTop="5dp"/>
     <Button
         android:id="@+id/btnConfirmVote"

@@ -43,6 +43,7 @@ class MovieVoteActivity : AppCompatActivity() {
                     recyclerView.adapter = MoviesAdapter(movies) { movie ->
                         // Ao clicar em um filme, chama a MovieDetailActivity
                         val intent = Intent(this@MovieVoteActivity, MovieDetailActivity::class.java)
+                        intent.putExtra("MOVIE_ID", movie.id)
                         intent.putExtra("MOVIE_NAME", movie.nome)
                         intent.putExtra("MOVIE_GENRE", movie.genero)
                         intent.putExtra("MOVIE_POSTER", movie.foto)

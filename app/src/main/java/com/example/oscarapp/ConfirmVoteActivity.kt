@@ -39,7 +39,7 @@ class ConfirmVoteActivity : AppCompatActivity() {
         val votoFilme = sharedPreferences.getInt("VOTO_FILME", -1)
         val votoDiretor = sharedPreferences.getInt("VOTO_DIRETOR", -1)
 
-        if (!(votoFilme != -1 && votoDiretor != -1)) {
+        if (!(votoFilme == -1 && votoDiretor == -1)) {
             btnConfirmVote.isEnabled = false
 
             fetchDirectors { directors ->
@@ -79,14 +79,24 @@ class ConfirmVoteActivity : AppCompatActivity() {
 
     // Função que cria e exibe o AlertDialog
     private fun showConfirmationDialog(movie: Int, director: Int, token: String) {
+        val etToken = findViewById<EditText>(R.id.etToken)
+        val sharedPreferences = getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+        val usuarioId = sharedPreferences.getInt("USER_ID", -1)
+
         val builder = AlertDialog.Builder(this)
         builder.setTitle("Confirmar Voto")
         builder.setMessage("Você confirma o seu Voto?")
 
         // Botão "Sim"
         builder.setPositiveButton("Sim") { dialog, which ->
-            // Salva o voto
-            enviarVoto(token, movie, director)
+            // Verifica se o token está correto
+            if (token.isEmpty() || token != etToken.text.toString()) {
+                Toast.makeText(this, "Digite o token corretamente!", Toast.LENGTH_SHORT).show()
+                return@setPositiveButton // Interrompe o fluxo dentro do botão
+            }
+
+            // Executa os próximos passos somente se o token estiver correto
+            enviarVoto(usuarioId, movie, director)
             Toast.makeText(this, "Voto confirmado!", Toast.LENGTH_SHORT).show()
             finish() // Finaliza a activity e retorna à tela anterior
         }
@@ -109,9 +119,9 @@ class ConfirmVoteActivity : AppCompatActivity() {
         editor.apply()
     }
 
-    private fun enviarVoto(token: String, filme: Int, diretor: Int) {
+    private fun enviarVoto(usuarioId: Int, filme: Int, diretor: Int) {
         val api = RetrofitClientLogin.instance.create(ApiService::class.java)
-        val votoRequest = VotoRequest(filme, diretor, token)
+        val votoRequest = VotoRequest(filme, diretor, usuarioId)
 
         api.votar(votoRequest).enqueue(object : Callback<VotoResponse> {
             override fun onResponse(call: Call<VotoResponse>, response: Response<VotoResponse>) {
